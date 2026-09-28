@@ -60,11 +60,39 @@ On Windows, that path is `C:\Users\<you>\.claude\skills\learn-by-building`.
 That is the whole install. Claude picks the skill up automatically the next time it starts, and uses
 it when you ask for something it covers.
 
-**Optional**, for the checker and the progress tools, which are Go programs:
+You also need **Go installed** if you want the checker — see the next section, because that is true
+whichever language you are learning.
 
 ```bash
 go version   # 1.21 or newer
 ```
+
+## Which languages does it work for?
+
+The method has nothing to do with Go, and neither does the content format. Which language you are
+learning is configuration, in `track.json`:
+
+```jsonc
+"language": { "key": "py", "name": "Python", "file": "main.py",
+              "run": ["python", "main.py"] },
+"contrast": { "key": "js", "name": "JavaScript", "run": ["node", "main.cjs"] },
+"exercise": { "test": ["python", "-m", "pytest", "{dir}"] }
+```
+
+Rust would be a `Cargo.toml` in `setup` and `["cargo", "run", "-q"]`. The lessons, the briefs, the
+board and the topic map do not change at all.
+
+**Two things are Go-bound today, and it is worth knowing before you start:**
+
+1. **The checker is a Go program** (`scripts/lessoncheck/main.go`, standard library only). It runs
+   *your* language's commands, but it is itself Go, so the machine needs Go installed even for a
+   Python track. If that is a problem, porting it to Node is a contained job — parse, collect, run,
+   compare, write `content.json` — and `references/verification.md` says how.
+2. **Every example in this repo is Go**, with JavaScript as the language-you-already-know. That is
+   what I happened to be learning; it is not a limitation of the format.
+
+I have run this with Go and JavaScript. If you use it for another language and something in the
+tooling assumes Go, tell me — that is exactly the feedback worth having.
 
 ## Use it
 
