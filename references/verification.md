@@ -21,7 +21,14 @@ Everything project-specific lives here. `assets/track.example.json` is a working
 - Python: `"run": ["python", "main.py"]`, `"exercise.test": ["python", "-m", "pytest", "{dir}"]`.
 - Rust: a `Cargo.toml` in `setup` and `["cargo", "run", "-q"]`.
 
-The checker itself is Go, so the machine needs Go to run it. If it doesn't have Go, port `main.go` to Node: the structure (parse, collect groups, run, compare, write `content.json`) carries over one-to-one. Say which languages you actually tested; this was only run with Go examples and JavaScript contrasts.
+The checker ships twice: `lessoncheck.mjs` (Node 18+, no dependencies) and `main.go` (Go, standard library only). Either one verifies any track — they run *your* language's commands — so a Python or Rust track needs no Go at all. Use whichever the machine already has:
+
+```
+node tools/lessoncheck/lessoncheck.mjs [-update]
+go run ./tools/lessoncheck [-update]
+```
+
+They are kept in step deliberately: on the same track they report the same problems in the same words and write the same `content.json`. One difference — Go can check gofmt formatting in-process, so the Node version shells out to `gofmt` when `language.gofmt` is set, and reports plainly when gofmt is not installed rather than skipping the check silently. Say which languages you actually tested; this has been run with Go and JavaScript tracks.
 
 ## What it checks
 

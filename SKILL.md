@@ -12,7 +12,7 @@ A way to learn a language, system design and design patterns **through one real 
 - **Nothing is lost.** Lessons are files. Clicks, answers and notes live on the board and are copied to disk every session.
 - **Learning and product stay apart.** The product repo holds only product material; the learning folder stays private.
 
-The language being learned is configuration (`track.json` → `language`, `contrast`, `exercise.test`), not something baked into the format: the examples here are Go with JavaScript as the known language, but nothing about the lessons, briefs or board is Go-specific. The checker itself is a Go program.
+The language being learned is configuration (`track.json` → `language`, `contrast`, `exercise.test`), not something baked into the format: the examples here are Go with JavaScript as the known language, but nothing about the lessons, briefs or board is Go-specific. The checker ships as both a Node script and a Go program, so only the language being learned needs its own toolchain.
 
 This skill specialises `design-and-build-workflow`. That skill's stages (understand → requirements → plan → build → prove), its templates and its teaching formats all apply. Load it too if it's available.
 
@@ -53,7 +53,7 @@ Build the topic map (`references/curriculum.md`):
 Write it as tables in `plan.md`, generate `board/curriculum.json` from them, and **count everything with a script** before stating a number. Say the honest size up front, e.g. "84 core lessons, written one milestone at a time".
 
 ### 5. Set up the learning folder, the checker and the board
-1. Create the learning folder with a `go.mod` — that is for the checker and the progress tool, which are Go programs whatever language is being learned. Copy `scripts/lessoncheck` and `scripts/progress` into `tools/`, and `assets/board/index.html` into `board/`, replacing `__TRACK_TITLE__` with the track's title.
+1. Create the learning folder. Copy `scripts/lessoncheck` and `scripts/progress` into `tools/`, and `assets/board/index.html` into `board/`, replacing `__TRACK_TITLE__` with the track's title. Run the checker with `node tools/lessoncheck/lessoncheck.mjs`, or `go run ./tools/lessoncheck` if the machine has Go — a Go track also wants a `go.mod` here so the exercises build.
 2. Write `track.json` (start from `assets/track.example.json`; `references/verification.md` explains every field).
 3. Run `go run ./tools/lessoncheck`, then **break one output on purpose** to see it fail, and restore it.
 4. Publish the board (`references/board-and-progress.md`: copy both board files to the scratchpad, publish with the `db` and `user` capabilities, keep the URL).

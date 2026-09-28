@@ -60,11 +60,11 @@ On Windows, that path is `C:\Users\<you>\.claude\skills\learn-by-building`.
 That is the whole install. Claude picks the skill up automatically the next time it starts, and uses
 it when you ask for something it covers.
 
-You also need **Go installed** if you want the checker — see the next section, because that is true
-whichever language you are learning.
+The checker and the progress tool ship in two versions, so nothing else is required:
 
 ```bash
-go version   # 1.21 or newer
+node tools/lessoncheck/lessoncheck.mjs   # Node 18+, no dependencies
+go run ./tools/lessoncheck               # the original, if you have Go
 ```
 
 ## Which languages does it work for?
@@ -82,17 +82,18 @@ learning is configuration, in `track.json`:
 Rust would be a `Cargo.toml` in `setup` and `["cargo", "run", "-q"]`. The lessons, the briefs, the
 board and the topic map do not change at all.
 
-**Two things are Go-bound today, and it is worth knowing before you start:**
+**One thing to know:** every example in this repo is Go, with JavaScript as the
+language-you-already-know. That is what I happened to be learning; it is not a limitation of the
+format.
 
-1. **The checker is a Go program** (`scripts/lessoncheck/main.go`, standard library only). It runs
-   *your* language's commands, but it is itself Go, so the machine needs Go installed even for a
-   Python track. If that is a problem, porting it to Node is a contained job — parse, collect, run,
-   compare, write `content.json` — and `references/verification.md` says how.
-2. **Every example in this repo is Go**, with JavaScript as the language-you-already-know. That is
-   what I happened to be learning; it is not a limitation of the format.
+The checker comes in both flavours — `lessoncheck.mjs` (Node 18+, no dependencies) and `main.go` —
+so a Python or Rust track needs nothing but Node. The two are kept in step: on the same track they
+produce the same counts, the same problem reports and the same `content.json`. The only thing the
+Node one cannot do in-process is check gofmt formatting, so if `language.gofmt` is set it shells out
+to `gofmt` and says so plainly when it is missing.
 
-I have run this with Go and JavaScript. If you use it for another language and something in the
-tooling assumes Go, tell me — that is exactly the feedback worth having.
+I have run this with Go and JavaScript tracks. If you use it for another language and something in
+the tooling assumes Go, tell me — that is exactly the feedback worth having.
 
 ## Use it
 
@@ -143,7 +144,7 @@ SKILL.md                    the workflow Claude follows, stage by stage
 references/                 the formats: curriculum, lessons, build briefs, verification, the board
 assets/board/index.html     the board, published as an artifact
 assets/examples/            a real lesson, a real build brief and its contract tests, a curriculum
-scripts/lessoncheck/        the checker: proves every output and every link
+scripts/lessoncheck/        the checker, in Node and in Go: proves every output and every link
 scripts/progress/           copies your board progress to disk
 scripts/specdump/           turns an OpenAPI spec into local Markdown, so docs stop living in a tab
 ```
