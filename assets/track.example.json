@@ -1,0 +1,45 @@
+{
+  "title": "Unified Shipping Logbook",
+  "eyebrow": "go-learning · on this machine only",
+  "lede": "Build supplier-neutral shipment booking, starting with Swiftpost, and learn Go, system design and design patterns on the way. Every lesson is used by a build step, and every build step is taught first.",
+  "route": ["Unified flow", "Swiftpost Express", "Cargolink, piece by piece"],
+  "module": "unifiedshipments",
+  "plan": "plan.md",
+  "bonusCap": 2,
+  "language": {
+    "key": "go",
+    "name": "Go",
+    "file": "main.go",
+    "setup": { "go.mod": "module example\n\ngo 1.25\n" },
+    "run": ["go", "run", "."],
+    "check": ["go", "vet", "."],
+    "gofmt": true,
+    "hljs": "go",
+    "runLabel": "go run ."
+  },
+  "contrast": {
+    "key": "js",
+    "name": "JavaScript",
+    "file": "main.cjs",
+    "run": ["node", "main.cjs"],
+    "hljs": "javascript",
+    "runLabel": "node"
+  },
+  "exercise": {
+    "setup": { "go.mod": "module {module}\n\ngo 1.25\n" },
+    "test": ["go", "test", "./{dir}/"]
+  },
+  "product": {
+    "repo": "../shipping-service",
+    "baseCommit": "eddf60a",
+    "protectedPaths": [
+      "services/cargolink_shipment_services",
+      "models/cargolink_shipment_models",
+      "controllers/cargolink_shipment_controllers",
+      "helpers/flt_db_ops_helper"
+    ],
+    "requirements": "docs/unified-shipping/requirements.md",
+    "capabilitiesHeading": "## 5. Capabilities",
+    "pilotColumn": "In the first slice (R9)?"
+  }
+}

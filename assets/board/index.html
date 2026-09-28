@@ -1,0 +1,829 @@
+<title>__TRACK_TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+:root{
+  --ground:#F2F5F7; --surface:#FFFFFF; --sunk:#E8EDF1; --ink:#15202A; --muted:#5A6875; --line:#D5DDE3;
+  --accent:#C77A12; --accent-soft:#F7E6CC;
+  --teal:#0B7A84; --teal-soft:#D5EEF0;
+  --indigo:#4B4FC9; --indigo-soft:#E1E2F8;
+  --rust:#A8502A; --rust-soft:#F4E0D6;
+  --build:#2F7443; --build-soft:#DAEEDF;
+  --ok:#2F7443; --warn:#B26A00; --bad:#B3261E; --open:#8A3FA0;
+  --code-bg:#1B2530; --code-ink:#E6EDF3; --code-muted:#8C9BAB; --out-bg:#0F171F;
+  --tk-key:#FF9E64; --tk-str:#A5D6A7; --tk-num:#F7C873; --tk-com:#7F8C98; --tk-fn:#82B1FF; --tk-type:#4DD0E1;
+  --t0:var(--teal); --t0-soft:var(--teal-soft); --t1:var(--indigo); --t1-soft:var(--indigo-soft);
+  --t2:var(--rust); --t2-soft:var(--rust-soft); --t3:var(--open); --t3-soft:var(--sunk);
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0E141A; --surface:#161F27; --sunk:#1D2832; --ink:#E3E9EE; --muted:#93A2AF; --line:#2A3743;
+    --accent:#E9A23B; --accent-soft:#3A2B14;
+    --teal:#4CC3CC; --teal-soft:#123237; --indigo:#9A9DF2; --indigo-soft:#23254A;
+    --rust:#E48D66; --rust-soft:#3A2419; --build:#6FC487; --build-soft:#17311F;
+    --ok:#6FC487; --warn:#E9A23B; --bad:#F2877F; --open:#CF8BE3;
+    --code-bg:#0B1117; --out-bg:#060A0E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0E141A; --surface:#161F27; --sunk:#1D2832; --ink:#E3E9EE; --muted:#93A2AF; --line:#2A3743;
+  --accent:#E9A23B; --accent-soft:#3A2B14;
+  --teal:#4CC3CC; --teal-soft:#123237; --indigo:#9A9DF2; --indigo-soft:#23254A;
+  --rust:#E48D66; --rust-soft:#3A2419; --build:#6FC487; --build-soft:#17311F;
+  --ok:#6FC487; --warn:#E9A23B; --bad:#F2877F; --open:#CF8BE3;
+  --code-bg:#0B1117; --out-bg:#060A0E;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.6 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:26px 72px}
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:.005em}
+h1{font-size:34px;font-weight:700;line-height:1.1}
+h2{font-size:22px;font-weight:600}
+h3{font-size:18px;font-weight:600}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.92em;background:var(--sunk);padding:.08em .35em;border-radius:3px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.lede{color:var(--muted);max-width:70ch;margin:8px 0 0}
+button{font:inherit;color:inherit}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:7px 12px;cursor:pointer;font:500 13.5px/1.2 var(--body)}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1B1306}
+.btn.quiet{background:none;border-color:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:2px;padding-inline:4px}
+.btn[disabled]{opacity:.5;cursor:default}
+header.top{display:grid;gap:16px;margin-bottom:18px}
+.route{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:500 13px/1 var(--mono);color:var(--muted)}
+.route b{color:var(--ink);font-weight:500;background:var(--surface);border:1px solid var(--line);padding:6px 8px;border-radius:4px}
+.route b.now{border-color:var(--accent);background:var(--accent-soft)}
+.meters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.meter{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:11px 13px;display:grid;gap:7px}
+.meter .lab{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;color:var(--muted)}
+.meter .lab strong{font:600 18px/1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.meter small{font-size:12px;color:var(--muted)}
+.bar{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.next{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--accent);border-radius:6px;padding:12px 14px}
+.next .eyebrow{color:var(--accent)}
+.next strong{display:block;font:600 17px/1.3 var(--display)}
+nav.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:22px 0 18px;overflow-x:auto}
+nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:9px 12px;cursor:pointer;color:var(--muted);font:500 14px/1 var(--body);white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.ms{background:var(--surface);border:1px solid var(--line);border-radius:6px;margin-bottom:10px}
+.ms.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.ms-h{margin:0;font:inherit}
+.ms-head{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:13px 15px;background:none;border:0;text-align:left;cursor:pointer}
+.code{font:600 13px/1 var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:6px 7px;min-width:44px;text-align:center}
+.ms.current .code{color:var(--accent);border-color:var(--accent)}
+.ms-title .t{display:block;font:600 18px/1.25 var(--display)}
+.ms-title .g{display:block;color:var(--muted);font-size:13.5px}
+.balance{font:500 12px/1.4 var(--mono);color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ms-body{border-top:1px solid var(--line);padding:12px 15px 15px;display:grid;gap:14px}
+.gate{font-size:13.5px;background:var(--sunk);border-radius:4px;padding:8px 10px}
+.gate span,.lbl{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.gate span{margin-right:6px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.list{display:grid;gap:6px;margin-top:8px}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:5px;padding:8px 10px;background:var(--surface)}
+.row.link{cursor:pointer;text-align:left;width:100%}
+.row.link:hover{border-color:var(--muted)}
+.row .rt{font-weight:500}
+.row small{display:block;color:var(--muted);font-size:12.5px}
+.pill{font:500 11.5px/1 var(--mono);padding:4px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.learned,.pill.working,.pill.done,.pill.passed,.pill.tested{color:var(--ok);border-color:currentColor}
+.pill.understood,.pill.practised,.pill.in-progress,.pill.active{color:var(--warn);border-color:currentColor}
+.pill.ready{color:var(--accent);border-color:currentColor}
+.pill.skipped,.pill.not-planned{font-style:italic}
+.pill.bonus{color:var(--open);border-color:currentColor}
+.chip{font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:4px 6px;border-radius:3px}
+.chip.t0{color:var(--t0);background:var(--t0-soft)} .chip.t1{color:var(--t1);background:var(--t1-soft)}
+.chip.t2{color:var(--t2);background:var(--t2-soft)} .chip.t3{color:var(--t3);background:var(--t3-soft)} .chip.build{color:var(--build);background:var(--build-soft)}
+.chip.flag{color:var(--muted);background:var(--sunk)}
+.owner{font:500 11px/1 var(--mono);color:var(--muted)}
+/* lesson */
+.crumb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.lesson-head{display:grid;gap:8px;margin-bottom:16px}
+.lesson-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.prose{max-width:72ch}
+.prose p{margin:.5em 0}
+.prose ul,.prose ol{margin:.4em 0;padding-left:1.3em}
+.prose table{border-collapse:collapse;margin:.6em 0;font-size:14px}
+.prose th,.prose td{border:1px solid var(--line);padding:5px 8px;text-align:left}
+.tablewrap{overflow-x:auto}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:16px 18px;margin-bottom:14px}
+.card.concept.done{border-color:color-mix(in srgb,var(--ok) 55%,var(--line))}
+.card-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.card-h h3{font-size:20px;flex:1 1 320px}
+.card-h h3 code{font-size:.85em}
+.sec{margin-top:12px}
+.sec > .lbl{display:block;margin-bottom:6px}
+.codebox{border-radius:6px;overflow:hidden;margin:8px 0;border:1px solid color-mix(in srgb,var(--code-bg) 70%,var(--line))}
+.codebox .cap{display:flex;justify-content:space-between;gap:8px;background:var(--code-bg);color:var(--code-muted);font:500 12px/1 var(--mono);padding:7px 10px;border-bottom:1px solid #FFFFFF14}
+.codebox pre{margin:0;background:var(--code-bg);color:var(--code-ink);padding:10px 12px;overflow-x:auto;font:13.5px/1.55 var(--mono);tab-size:4}
+.codebox pre code{background:none;padding:0;font-size:inherit;color:inherit}
+.codebox.out .cap{background:var(--out-bg)}
+.codebox.out pre{background:var(--out-bg);color:#D5F5D5}
+.codebox.snippet .cap::after{content:"not run";font-style:italic}
+.hljs-keyword,.hljs-meta{color:var(--tk-key)} .hljs-string{color:var(--tk-str)} .hljs-number,.hljs-literal{color:var(--tk-num)}
+.hljs-comment{color:var(--tk-com);font-style:italic} .hljs-title,.hljs-title.function_{color:var(--tk-fn)} .hljs-type,.hljs-built_in{color:var(--tk-type)}
+details.contrast{margin-top:14px;border:1px dashed var(--line);border-radius:6px;padding:0 12px}
+details.contrast > summary{cursor:pointer;padding:9px 0;font:500 13.5px/1.3 var(--body);color:var(--muted);list-style:none}
+details.contrast > summary::-webkit-details-marker{display:none}
+details.contrast > summary::before{content:"\25B8";display:inline-block;margin-right:7px;transition:transform .15s}
+details.contrast[open] > summary::before{transform:rotate(90deg)}
+details.contrast[open]{padding-bottom:10px}
+details.contrast[open] > summary{color:var(--ink)}
+.takeaway{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:0 5px 5px 0;font-weight:500}
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.check{display:inline-flex;gap:8px;align-items:center;cursor:pointer;font-weight:500}
+.check input{width:18px;height:18px;accent-color:var(--ok)}
+.notebox textarea,.answer{display:block;width:100%;min-height:70px;resize:vertical;font:14px/1.5 var(--body);color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:5px;padding:8px}
+.answer.mono{font-family:var(--mono);min-height:52px}
+.notebox{margin-top:10px}
+.notebox summary{cursor:pointer;color:var(--muted);font:500 12.5px/1.4 var(--mono)}
+.notebox summary.has{color:var(--accent)}
+.exercise .type{font:600 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.result{margin-top:10px;padding:9px 12px;border-radius:5px;font-weight:500}
+.result.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok)}
+.result.bad{background:color-mix(in srgb,var(--bad) 13%,transparent);color:var(--bad)}
+.options{display:grid;gap:6px;margin:10px 0}
+.options label{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:5px;padding:8px 10px;cursor:pointer}
+.options label.right{border-color:var(--ok)} .options label.wrong{border-color:var(--bad)}
+.hints{display:grid;gap:6px;margin:8px 0}
+.hint{background:var(--sunk);border-radius:5px;padding:7px 10px;font-size:14px}
+.cmd{display:flex;gap:8px;align-items:stretch;margin:8px 0}
+.cmd pre{flex:1;margin:0;background:var(--code-bg);color:var(--code-ink);padding:9px 11px;border-radius:5px;font:13px/1.5 var(--mono);overflow-x:auto}
+.checklist{display:grid;gap:6px;margin:10px 0}
+.checklist label{display:flex;gap:9px;align-items:flex-start}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+details.files{margin-top:8px} details.files summary{cursor:pointer;color:var(--muted);font:500 12.5px/1.4 var(--mono)}
+/* topics */
+.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tcol h3{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.tcol h3 small{font:500 12px/1 var(--mono);color:var(--muted)}
+.trow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-radius:4px;border:1px solid transparent;background:none;text-align:left;width:100%}
+.trow.link{cursor:pointer} .trow.link:hover{border-color:var(--line);background:var(--surface)}
+.trow .m{font:500 11.5px/1 var(--mono);color:var(--muted);min-width:30px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 10px;font:500 12.5px/1 var(--body);cursor:pointer;color:var(--muted)}
+.filters button[aria-pressed="true"]{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
+.notice{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:4px;padding:10px 12px;font-size:13.5px;margin:10px 0}
+table.plain{border-collapse:collapse;width:100%;font-size:14px}
+table.plain th,table.plain td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+table.plain th{font:500 11.5px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+@media (max-width:900px){.meters{grid-template-columns:repeat(2,minmax(0,1fr))}.tgrid{grid-template-columns:1fr}.cols{grid-template-columns:1fr}}
+@media (max-width:540px){h1{font-size:27px}.ms-head{grid-template-columns:auto minmax(0,1fr)}.ms-head .balance{grid-column:2;text-align:left}.card{padding:14px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="track-title">Learning logbook</h1>
+    <p class="lede" id="lede"></p>
+    <div class="route" id="route" aria-label="Build order"></div>
+    <div class="meters" id="meters"></div>
+    <div id="next"></div>
+  </header>
+  <div id="notice"></div>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="view"><p class="muted">Loading…</p></main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const TABS = [["journey","Journey"],["topics","Topics"],["feature","Feature"],["notes","Notes"],["decisions","Decisions"],["log","Log"]];
+  let TRACKS = [];            // [key, label] from curriculum.tracks, set once content loads
+  const T = () => (S && S.content && S.content.track) || {};
+  const LANG = () => T().language || {};
+  const CONTRAST = () => T().contrast || null;
+  const trackIndex = key => Math.max(0, TRACKS.findIndex(t => t[0] === key)) % 4;
+  const trackLabel = key => (TRACKS.find(t => t[0] === key) || [key, key])[1];
+  const TYPE_LABEL = {predict:"Predict", choice:"Choose", write:"Write", fix:"Fix", explain:"Read & explain"};
+  const S = {content:null, db:null, readOnly:false, concepts:{}, exercises:{}, lessons:{}, route:"journey", filter:"all", testout:null};
+  const drafts = {};          // unsaved text keyed by element id
+  const openNotes = new Set(); // note boxes the viewer opened
+  let openContrast = new Set();  // comparison sections the viewer opened
+  try { const raw = localStorage.getItem("lbb-open-contrast"); if (raw) openContrast = new Set(JSON.parse(raw)); } catch (e) {}
+  const timers = {};
+  let pendingScroll = null;
+
+  // ---------- helpers ----------
+  const el = (tag, attrs, ...kids) => {
+    const n = document.createElement(tag);
+    if (attrs) for (const [k, v] of Object.entries(attrs)) {
+      if (v === false || v == null) continue;
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k === "html") n.innerHTML = v;
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? "" : v);
+    }
+    for (const c of kids.flat()) if (c != null && c !== false) n.append(c);
+    return n;
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const md = s => (window.marked ? window.marked.parse(s || "") : "<p>" + esc(s || "").replace(/\n\n/g, "</p><p>") + "</p>");
+  const mdi = s => (window.marked ? window.marked.parseInline(s || "") : esc(s || ""));
+  const prose = s => { const d = el("div", {class:"prose"}); d.innerHTML = md(s); d.querySelectorAll("table").forEach(t => { const w = el("div", {class:"tablewrap"}); t.replaceWith(w); w.append(t); }); return d; };
+  const highlight = (code, lang) => {
+    const c = CONTRAST();
+    const id = lang === LANG().key ? LANG().hljs : c && lang === c.key ? c.hljs : null;
+    if (window.hljs && id) {
+      try { return window.hljs.highlight(code, {language: id}).value; } catch (e) {}
+    }
+    return esc(code);
+  };
+  const lessonsById = () => Object.fromEntries(S.content.lessons.map(l => [l.id, l]));
+  const briefFor = id => (S.content.briefs || {})[id];
+  const topicById = id => S.content.curriculum.topics.find(t => t.id === id);
+  const msById = id => S.content.curriculum.milestones.find(m => m.id === id);
+  const allExercises = () => S.content.lessons.flatMap(l => l.exercises.map(e => Object.assign({lesson: l.id}, e)));
+  const exState = id => (S.exercises[id] || {}).state || "open";
+
+  function showNotice(msg){ document.getElementById("notice").replaceChildren(msg ? el("div", {class:"notice", text: msg}) : ""); }
+
+  // ---------- state ----------
+  function topicState(t){
+    if (t.kind === "not-planned") return "not-planned";
+    if (!t.lesson) return t.kind === "bonus" ? "bonus" : "planned";
+    const ls = S.lessons[t.lesson] || {};
+    if (ls.testedOut) return "learned";
+    if (ls.skipped) return "skipped";
+    const lesson = lessonsById()[t.lesson];
+    const c = lesson && lesson.concepts.find(x => x.id === t.id);
+    const understood = !!(S.concepts[t.id] || {}).understood;
+    const practised = !!(c && (c.practisedBy || []).some(ex => exState(ex) === "passed"));
+    if (understood && practised) return "learned";
+    if (understood) return "understood";
+    if (practised) return "practised";
+    return "ready";
+  }
+  const STATE_LABEL = {"learned":"Learned","understood":"Understood","practised":"Practised","ready":"Ready to learn","skipped":"Skipped","planned":"Planned","bonus":"Bonus","not-planned":"Not planned"};
+  const lessonProgress = l => {
+    const st = l.concepts.map(c => topicState(topicById(c.id)));
+    const done = st.filter(s => s === "learned" || s === "skipped").length;
+    return {done, total: st.length, state: (S.lessons[l.id] || {}).testedOut ? "tested" : done === st.length ? "learned" : st.some(s => s !== "ready") ? "in-progress" : "ready"};
+  };
+  const buildDone = b => b.state === "done" || (b.exercise && exState(b.exercise) === "passed");
+
+  // ---------- writes (one at a time per document) ----------
+  const queue = {};
+  function save(coll, id, patch){
+    const cur = Object.assign({}, S[coll][id] || {}, patch);
+    S[coll][id] = cur;
+    if (!S.db || S.readOnly) { renderAll(); return Promise.resolve(false); }
+    const key = coll + "/" + id;
+    const prev = queue[key] || Promise.resolve();
+    queue[key] = prev.then(() => S.db.doc(key).set(Object.assign({}, S[coll][id]))).then(() => true, e => {
+      if (e && e.code === "invalid_argument") { S.readOnly = true; showNotice("You can view this board but not change it."); }
+      else showNotice("That change didn't save. Try again in a moment.");
+      return false;
+    });
+    renderAll();
+    return queue[key];
+  }
+  function noteBox(coll, id){
+    const cur = (S[coll][id] || {}).note || "";
+    const tid = "note-" + coll + "-" + id;
+    const value = tid in drafts ? drafts[tid] : cur;
+    const ta = el("textarea", {id: tid, "aria-label": "Your note", placeholder: "What you understood, in your own words…", disabled: S.readOnly || !S.db});
+    ta.value = value;
+    const flush = () => { if (!(tid in drafts)) return; const v = drafts[tid]; if (v === ((S[coll][id] || {}).note || "")) { delete drafts[tid]; return; } save(coll, id, {note: v}).then(ok => { if (ok && drafts[tid] === v) delete drafts[tid]; }); };
+    ta.addEventListener("input", () => { drafts[tid] = ta.value; clearTimeout(timers[tid]); timers[tid] = setTimeout(flush, 900); });
+    ta.addEventListener("blur", () => { clearTimeout(timers[tid]); flush(); });
+    const det = el("details", {class:"notebox", open: value || openNotes.has(tid) ? true : false}, el("summary", {class: value ? "has" : "", text: value ? "Your note" : "Add a note"}), ta);
+    det.addEventListener("toggle", () => { if (det.open) openNotes.add(tid); else openNotes.delete(tid); });
+    return det;
+  }
+  function draftInput(id, attrs){
+    const ta = el("textarea", Object.assign({id}, attrs));
+    ta.value = drafts[id] || "";
+    ta.addEventListener("input", () => { drafts[id] = ta.value; });
+    return ta;
+  }
+
+  // ---------- rendering ----------
+  function renderAll(){
+    if (!S.content) return;
+    const a = document.activeElement, fid = a && a.id;
+    let ss = null, se = null;
+    try { if (a && typeof a.selectionStart === "number") { ss = a.selectionStart; se = a.selectionEnd; } } catch (e) {}
+    renderMeters(); renderNext(); renderTabs(); renderView();
+    if (fid) { const n = document.getElementById(fid); if (n && n !== a) { n.focus({preventScroll:true}); if (ss !== null && n.setSelectionRange) { try { n.setSelectionRange(ss, se); } catch (e) {} } } }
+    if (pendingScroll) { const t = document.getElementById(pendingScroll); pendingScroll = null; if (t) t.scrollIntoView({block:"start"}); }
+  }
+
+  function renderMeters(){
+    const box = document.getElementById("meters"); box.replaceChildren();
+    const topics = S.content.curriculum.topics;
+    for (const [k, label] of TRACKS) {
+      const slot = "var(--t" + trackIndex(k) + ")";
+      const core = topics.filter(t => t.track === k && t.kind === "core");
+      if (!core.length) continue;
+      const st = core.map(topicState);
+      const learned = st.filter(s => s === "learned").length, partial = st.filter(s => s === "understood" || s === "practised").length;
+      const bar = el("div", {class:"bar", role:"img", "aria-label": label + ": " + learned + " of " + core.length + " core topics learned"},
+        el("i", {style: "width:" + (learned / core.length * 100) + "%;background:" + slot}),
+        el("i", {style: "width:" + (partial / core.length * 100) + "%;background:" + slot + ";opacity:.35"}));
+      box.append(el("div", {class:"meter"}, el("div", {class:"lab"}, el("span", {text: label}), el("strong", {text: learned + "/" + core.length})), bar, el("small", {text: "core topics learned" + (partial ? " · " + partial + " under way" : "")})));
+    }
+    const caps = S.content.curriculum.capabilities, working = caps.filter(c => c.state === "working").length;
+    box.append(el("div", {class:"meter"}, el("div", {class:"lab"}, el("span", {text:"Feature"}), el("strong", {text: working + "/" + caps.length})),
+      el("div", {class:"bar"}, el("i", {style: "width:" + (working / caps.length * 100) + "%;background:var(--build)"})), el("small", {text:"capabilities working"})));
+  }
+
+  function nextUp(){
+    const byMs = [...S.content.curriculum.milestones].sort((a, b) => a.order - b.order);
+    for (const m of byMs) {
+      for (const l of S.content.lessons.filter(x => x.milestone === m.id)) {
+        const ls = S.lessons[l.id] || {};
+        if (ls.testedOut || ls.skipped) continue;
+        for (const c of l.concepts) {
+          const st = topicState(topicById(c.id));
+          if (st !== "learned" && st !== "skipped") return {lesson: l, concept: c, milestone: m};
+        }
+      }
+      const b = S.content.curriculum.builds.find(x => x.milestone === m.id && !buildDone(x));
+      if (b) return {build: b, milestone: m};
+    }
+    return null;
+  }
+  function renderNext(){
+    const box = document.getElementById("next"), n = nextUp();
+    if (!n) { box.replaceChildren(); return; }
+    const label = n.concept ? n.milestone.code + " · " + n.lesson.title : n.milestone.code + " · build step";
+    const title = n.concept ? n.concept.title : n.build.title;
+    const go = () => {
+      if (n.concept) openLesson(n.lesson.id, "c-" + n.concept.id);
+      else if (briefFor(n.build.id)) openBrief(n.build.id);
+      else if (n.build.exercise) { const ex = allExercises().find(e => e.id === n.build.exercise); openLesson(ex.lesson, "x-" + ex.id); }
+      else setRoute("journey");
+    };
+    const t = el("strong"); t.innerHTML = mdi(title);
+    box.replaceChildren(el("div", {class:"next"}, el("div", null, el("div", {class:"eyebrow", text:"Up next · " + label}), t),
+      el("button", {class:"btn primary", onclick: go, text: n.concept ? "Continue" : "Open"})));
+  }
+
+  function renderTabs(){
+    const nav = document.getElementById("tabs"); nav.replaceChildren();
+    const active = S.route.startsWith("lesson-") ? "journey" : S.route;
+    for (const [k, label] of TABS) nav.append(el("button", {role:"tab", "aria-selected": String(active === k), onclick: () => setRoute(k), text: label}));
+  }
+
+  function renderView(){
+    const v = document.getElementById("view");
+    const r = S.route;
+    let node;
+    if (r.startsWith("lesson-")) node = viewLesson(r.slice(7));
+    else if (r.startsWith("brief-")) node = viewBrief(r.slice(6));
+    else node = ({journey: viewJourney, topics: viewTopics, feature: viewFeature, notes: viewNotes, decisions: viewDecisions, log: viewLog}[r] || viewJourney)();
+    v.replaceChildren(node);
+  }
+
+  // ---------- Journey ----------
+  let openMs = null;
+  try { const raw = localStorage.getItem("lbb-open-ms"); if (raw) openMs = new Set(JSON.parse(raw)); } catch (e) {}
+  function viewJourney(){
+    const box = el("section");
+    const ms = [...S.content.curriculum.milestones].sort((a, b) => a.order - b.order);
+    const n = nextUp();
+    const current = n ? n.milestone.id : null;
+    if (!openMs) openMs = new Set(current ? [current] : []);
+    for (const m of ms) {
+      const lessons = S.content.lessons.filter(l => l.milestone === m.id);
+      const builds = S.content.curriculum.builds.filter(b => b.milestone === m.id);
+      const concepts = lessons.flatMap(l => l.concepts);
+      const learnedN = concepts.filter(c => { const s = topicState(topicById(c.id)); return s === "learned" || s === "skipped"; }).length;
+      const coreN = S.content.curriculum.topics.filter(t => t.milestone === m.id && t.kind === "core").length;
+      const buildN = builds.filter(buildDone).length;
+      const isOpen = openMs.has(m.id);
+      const head = el("button", {class:"ms-head", id: "ms-" + m.id, "aria-expanded": String(isOpen), onclick: () => { isOpen ? openMs.delete(m.id) : openMs.add(m.id); try { localStorage.setItem("lbb-open-ms", JSON.stringify([...openMs])); } catch (e) {} renderAll(); }},
+        el("span", {class:"code", text: m.code}),
+        el("span", {class:"ms-title"}, el("span", {class:"t", text: m.title}), el("span", {class:"g", text: m.goal})),
+        el("span", {class:"balance"}, "Learn " + (lessons.length ? learnedN + "/" + concepts.length : "0/" + coreN), el("br"), "Build " + buildN + "/" + builds.length));
+      const card = el("div", {class: "ms" + (m.id === current ? " current" : "")}, el("h3", {class:"ms-h"}, head));
+      if (isOpen) {
+        const learn = el("div", null, el("span", {class:"lbl", text:"Learn"}));
+        const list = el("div", {class:"list"});
+        if (!lessons.length) list.append(el("div", {class:"row"}, el("span", {class:"muted", text: coreN + " topics. Lessons are written when this milestone starts."})));
+        for (const l of lessons) {
+          const p = lessonProgress(l);
+          list.append(el("button", {class:"row link", onclick: () => openLesson(l.id)},
+            el("span", null, el("span", {class:"rt", text: l.title}), el("small", {text: l.concepts.length + " concepts · " + l.exercises.length + " exercises"})),
+            el("span", {class:"pill " + p.state, text: p.state === "tested" ? "Tested out" : p.done + "/" + p.total + " learned"})));
+        }
+        learn.append(list);
+        const build = el("div", null, el("span", {class:"lbl", text:"Build"}));
+        const blist = el("div", {class:"list"});
+        for (const b of builds) {
+          const ex = b.exercise ? allExercises().find(e => e.id === b.exercise) : null;
+          const br = briefFor(b.id);
+          const done = buildDone(b);
+          const open = br ? () => openBrief(b.id) : ex ? () => openLesson(ex.lesson, "x-" + ex.id) : null;
+          const owner = {you:"You write it", claude:"Claude writes it", both:"Claude + you"}[b.owner];
+          const row = el(open ? "button" : "div", {class: "row" + (open ? " link" : ""), onclick: open},
+            el("span", null, el("span", {class:"rt", text: b.title}),
+              el("small", {class:"owner", text: owner + (br ? " · brief — you can start here" : "")})),
+            el("span", {class:"pill " + (done ? "done" : b.state), text: done ? "Done" : b.state === "in-progress" ? "In progress" : "Planned"}));
+          blist.append(row);
+        }
+        build.append(blist);
+        card.append(el("div", {class:"ms-body"}, el("div", {class:"gate"}, el("span", {text:"Done when"}), document.createTextNode(m.gate)), el("div", {class:"cols"}, learn, build)));
+      }
+      box.append(card);
+    }
+    return box;
+  }
+
+  // ---------- Lesson ----------
+  function openLesson(id, anchor){ pendingScroll = anchor || "top-of-lesson"; setRoute("lesson-" + id); }
+  function openBrief(id){ pendingScroll = "top-of-lesson"; setRoute("brief-" + id); }
+
+  function codeBox(b, extraCap){
+    const lang = b.lang || "";
+    const c = CONTRAST(), isContrast = !!(c && b.lang === c.key);
+    const cap = isContrast ? c.name : (b.file || LANG().file || "main");
+    const runLabel = b.snippet ? "" : isContrast ? (c.runLabel || "") : b.file ? "" : ((b.run === "check" || b.run === "vet") ? (LANG().checkLabel || "check") : (LANG().runLabel || "run"));
+    const pre = el("pre"); const code = el("code"); code.innerHTML = highlight(b.t, lang); pre.append(code);
+    return el("div", {class: "codebox" + (b.snippet ? " snippet" : "")}, el("div", {class:"cap"}, el("span", {text: cap}), el("span", {text: extraCap || runLabel})), pre);
+  }
+  function outBox(t){ return el("div", {class:"codebox out"}, el("div", {class:"cap"}, el("span", {text:"Output"}), el("span", {text:"real run"})), el("pre", {text: t === "" ? "(prints nothing)" : t})); }
+  function blocks(list){
+    const frag = el("div");
+    for (const b of list) {
+      if (b.k === "md") frag.append(prose(b.t));
+      else if (b.k === "code") frag.append(codeBox(b));
+      else if (b.k === "out") frag.append(outBox(b.t));
+    }
+    return frag;
+  }
+  const section = (u, name) => (u.sections || []).find(s => s.name === name);
+
+  function viewLesson(id){
+    const l = lessonsById()[id];
+    if (!l) return el("p", {text:"That lesson doesn't exist."});
+    const m = msById(l.milestone);
+    const ls = S.lessons[l.id] || {};
+    const p = lessonProgress(l);
+    const box = el("section", {id:"top-of-lesson"});
+    box.append(el("div", {class:"crumb"}, el("button", {class:"btn quiet", onclick: () => setRoute("journey"), text:"← Journey"}), el("span", {class:"eyebrow", text: m.code + " · " + m.title})));
+    const auto = l.exercises.filter(e => e.type === "predict" || e.type === "choice");
+    const actions = el("div", {class:"lesson-actions"},
+      el("span", {class:"pill " + p.state, text: ls.testedOut ? "Tested out" : ls.skipped ? "Skipped" : p.done + "/" + p.total + " concepts learned"}),
+      ls.skipped ? el("button", {class:"btn", onclick: () => save("lessons", l.id, {skipped:false}), text:"Undo skip"}) : el("button", {class:"btn", disabled: S.readOnly, onclick: () => save("lessons", l.id, {skipped:true}), text:"Skip — I know this"}),
+      ls.testedOut ? null : el("button", {class:"btn", disabled: S.readOnly, onclick: () => { S.testout = l.id; renderAll(); document.getElementById("testout")?.scrollIntoView({block:"start"}); }, text:"Test out (" + auto.length + " questions)"}));
+    box.append(el("div", {class:"lesson-head"}, el("h2", {text: l.title}), blocks(l.intro), actions,
+      el("p", {class:"muted", text: "Skipping doesn't count as learned and can be undone. Testing out means answering this lesson's questions before reading it: get them all right and every concept counts as learned."})));
+    if (S.testout === l.id) {
+      const tb = el("div", {class:"card", id:"testout"}, el("div", {class:"card-h"}, el("h3", {text:"Test out"}), el("button", {class:"btn quiet", onclick: () => { S.testout = null; renderAll(); }, text:"Close"})));
+      tb.append(el("p", {class:"muted", text:"Answer each one. If every answer is right, the lesson counts as learned."}));
+      for (const e of auto) tb.append(exerciseCard(l, e, true));
+      const results = auto.map(e => exState(e.id));
+      if (results.every(s => s === "passed")) { if (!ls.testedOut) setTimeout(() => save("lessons", l.id, {testedOut:true, skipped:false}), 0); tb.append(el("div", {class:"result ok", text:"All right. The lesson is marked as tested out."})); }
+      else if (results.every(s => s !== "open")) tb.append(el("div", {class:"result bad", text:"Not all right, so this lesson is worth reading. Your answers are kept."}));
+      box.append(tb);
+    }
+    for (const c of l.concepts) box.append(conceptCard(l, c));
+    if (l.exercises.length) {
+      box.append(el("h2", {text:"Practice", style:"margin:22px 0 10px"}));
+      for (const e of l.exercises) box.append(exerciseCard(l, e, false));
+    }
+    return box;
+  }
+
+  function conceptCard(l, c){
+    const t = topicById(c.id);
+    const st = topicState(t);
+    const h = el("h3"); h.innerHTML = mdi(c.title);
+    const card = el("article", {class: "card concept" + (st === "learned" ? " done" : ""), id: "c-" + c.id},
+      el("div", {class:"card-h"}, h, el("span", null, el("span", {class:"chip t" + trackIndex(t.track), text: trackLabel(t.track)}), " ", ...(c.flags || []).map(f => el("span", {class:"chip flag", text: f === "differs" ? "differs from " + ((CONTRAST() || {}).name || "what you know") : f === "new" ? "new to you" : f === "transfers" ? "like " + ((CONTRAST() || {}).name || "what you know") : f}))
+      )));
+    const STORAGE_CONTRAST = "lbb-open-contrast";
+    const cmp = CONTRAST() ? section(c, "In " + CONTRAST().name) : null;
+    for (const name of ["Example", "Explain", "More", "Takeaway"]) {
+      const s = section(c, name);
+      if (!s) continue;
+      if (name === "Takeaway") { const d = el("div", {class:"takeaway"}); d.innerHTML = mdi(s.blocks.map(b => b.t).join(" ")); card.append(el("div", {class:"sec"}, d)); continue; }
+      card.append(el("div", {class:"sec"}, name === "Example" ? null : el("span", {class:"lbl", text: name}), blocks(s.blocks)));
+    }
+    if (cmp) {
+      const det = el("details", {class:"contrast", open: openContrast.has(c.id)}, el("summary", null, "Compare with " + CONTRAST().name), el("div", null, blocks(cmp.blocks)));
+      det.addEventListener("toggle", () => {
+        if (det.open) openContrast.add(c.id); else openContrast.delete(c.id);
+        try { localStorage.setItem(STORAGE_CONTRAST, JSON.stringify([...openContrast])); } catch (e) {}
+      });
+      card.append(det);
+    }
+    const understood = !!(S.concepts[c.id] || {}).understood;
+    const cb = el("input", {type:"checkbox", id:"u-" + c.id, checked: understood, disabled: S.readOnly || !S.db});
+    cb.addEventListener("change", () => save("concepts", c.id, {understood: cb.checked}));
+    const practised = (c.practisedBy || []).map(id => { const ex = l.exercises.find(e => e.id === id) || allExercises().find(e => e.id === id); return ex ? el("a", {href:"#lesson-" + (ex.lesson || l.id), onclick: ev => { ev.preventDefault(); openLesson(ex.lesson || l.id, "x-" + id); }, text: ex.title}) : null; });
+    card.append(el("div", {class:"foot"},
+      el("label", {class:"check", for:"u-" + c.id}, cb, "I understand this"),
+      el("span", {class:"muted", style:"font-size:13px"}, "Practised by: ", ...practised.flatMap((a, i) => i ? [" · ", a] : [a]), el("span", {class:"pill " + st, style:"margin-left:8px", text: STATE_LABEL[st]}))));
+    card.append(noteBox("concepts", c.id));
+    return card;
+  }
+
+  const normalizeAns = s => String(s || "").replace(/\r/g, "").split("\n").map(x => x.trim()).join("\n").trim();
+
+  function exerciseCard(l, e, compact){
+    const st = S.exercises[e.id] || {};
+    const state = st.state || "open";
+    const h = el("h3"); h.innerHTML = mdi(e.title);
+    const card = el("article", {class:"card exercise", id: (compact ? "t-" : "x-") + e.id},
+      el("div", {class:"card-h"}, el("div", null, el("div", {class:"type", text: TYPE_LABEL[e.type]}), h),
+        el("span", null, el("span", {class:"pill " + (state === "passed" ? "passed" : state === "failed" ? "skipped" : ""), text: {open:"Not tried", passed:"Done", failed:"Answered, not right", revealed:"Reference shown", committed:"Answered"}[state] || state}))),
+      el("div", {class:"muted", style:"font-size:13px"}, "Practises: " + e.practises.map(p => (topicById(p) || {}).title || p).join(" · ")));
+    const answer = section(e, "Answer"), why = section(e, "Why");
+    const answerOut = answer ? (answer.blocks.find(b => b.k === "out") || {}).t : "";
+    const reveal = () => { const d = el("div"); if (answer) d.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"What it really prints"}), outBox(answerOut))); if (why) d.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"Why"}), blocks(why.blocks))); return d; };
+    const reset = el("button", {class:"btn quiet", onclick: () => save("exercises", e.id, {state:"open", answer:"", choice:null, hints:0, checks:[]}), text:"Try again"});
+
+    if (e.type === "predict" || e.type === "choice") {
+      card.append(blocks(section(e, "Prompt").blocks));
+      if (e.type === "predict") {
+        const aid = "ans-" + e.id + (compact ? "-t" : "");
+        if (state === "open") {
+          const ta = draftInput(aid, {class:"answer mono", "aria-label":"Your answer", placeholder:"Type exactly what it prints", disabled: S.readOnly || !S.db});
+          card.append(ta, el("div", {class:"actions"}, el("button", {class:"btn primary", disabled: S.readOnly || !S.db, onclick: () => {
+            const v = drafts[aid] || ""; if (!v.trim()) return;
+            const ok = normalizeAns(v) === normalizeAns(answerOut); delete drafts[aid];
+            save("exercises", e.id, {state: ok ? "passed" : "failed", answer: v});
+          }, text:"Check my answer"})));
+        } else {
+          card.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"Your answer"}), el("div", {class:"codebox out"}, el("pre", {text: st.answer || ""}))),
+            el("div", {class: "result " + (state === "passed" ? "ok" : "bad"), text: state === "passed" ? "Right." : "Not quite. Compare it with the real output below."}), reveal(), el("div", {class:"actions"}, reset));
+        }
+      } else {
+        const name = "opt-" + e.id + (compact ? "-t" : "");
+        const opts = el("div", {class:"options", role:"radiogroup"});
+        e.options.forEach((o, i) => {
+          const r = el("input", {type:"radio", name, value: String(i), checked: state === "open" ? drafts[name] === String(i) : st.choice === i, disabled: state !== "open" || S.readOnly || !S.db});
+          r.addEventListener("change", () => { drafts[name] = String(i); });
+          const lab = el("label", {class: state === "open" ? "" : o.correct ? "right" : st.choice === i ? "wrong" : ""}, r); const span = el("span"); span.innerHTML = mdi(o.text); lab.append(span);
+          opts.append(lab);
+        });
+        card.append(opts);
+        if (state === "open") card.append(el("div", {class:"actions"}, el("button", {class:"btn primary", disabled: S.readOnly || !S.db, onclick: () => {
+          if (!(name in drafts)) return; const i = Number(drafts[name]); delete drafts[name];
+          save("exercises", e.id, {state: e.options[i].correct ? "passed" : "failed", choice: i});
+        }, text:"Check my answer"})));
+        else card.append(el("div", {class: "result " + (state === "passed" ? "ok" : "bad"), text: state === "passed" ? "Right." : "Not this one. The highlighted option is correct."}), reveal(), el("div", {class:"actions"}, reset));
+      }
+    } else if (e.type === "write" || e.type === "fix") {
+      card.append(blocks(section(e, "Task").blocks));
+      const files = e.files || {starter:{}, solution:{}, tests:{}};
+      const cmd = (S.content.workdir ? "cd " + S.content.workdir + "\n" : "") + e.command;
+      const copy = el("button", {class:"btn", onclick: ev => { const b = ev.currentTarget; const done = () => { b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1500); }; try { navigator.clipboard.writeText(cmd).then(done, () => sel(pre)); } catch (x) { sel(pre); } }, text:"Copy"});
+      const pre = el("pre", {text: cmd});
+      const sel = n => { const r = document.createRange(); r.selectNodeContents(n); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+      card.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"Edit " + Object.keys(files.starter).map(f => e.practice + "/" + f).join(", ") + ", then run"}), el("div", {class:"cmd"}, pre, copy)));
+      const tests = el("details", {class:"files"}, el("summary", {text:"See the tests"}), ...Object.entries(files.tests).map(([n, t]) => codeBox({lang: LANG().key, t, file: n}, "tests")));
+      card.append(tests);
+      const shown = st.hints || 0;
+      const hints = el("div", {class:"hints"});
+      (e.hints || []).slice(0, shown).forEach((hnt, i) => { const d = el("div", {class:"hint"}); d.innerHTML = "<strong>Hint " + (i + 1) + ".</strong> " + mdi(hnt); hints.append(d); });
+      card.append(hints);
+      if (state === "open") {
+        card.append(el("div", {class:"actions"},
+          shown < (e.hints || []).length ? el("button", {class:"btn", disabled: S.readOnly || !S.db, onclick: () => save("exercises", e.id, {hints: shown + 1}), text: "Show hint " + (shown + 1) + " of " + e.hints.length}) : null,
+          el("button", {class:"btn primary", disabled: S.readOnly || !S.db, onclick: () => save("exercises", e.id, {state:"passed"}), text:"My tests pass"}),
+          el("button", {class:"btn quiet", disabled: S.readOnly || !S.db, onclick: () => save("exercises", e.id, {state:"revealed"}), text:"Show the reference without passing"})));
+      } else {
+        card.append(el("div", {class: "result " + (state === "passed" ? "ok" : "bad"), text: state === "passed" ? "Done: you ran the tests and they passed. Compare your code with the reference." : "Reference shown before the tests passed, so this doesn't count as practised yet. Get your tests passing, then choose Try again → My tests pass."}));
+        card.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"Reference solution"}), ...Object.entries(files.solution).map(([n, t]) => codeBox({lang: LANG().key, t, file: n}, "reference"))));
+        if (why) card.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"Why"}), blocks(why.blocks)));
+        card.append(el("div", {class:"actions"}, reset));
+      }
+    } else if (e.type === "explain") {
+      card.append(blocks(section(e, "Task").blocks));
+      const aid = "exp-" + e.id;
+      if (state === "open") {
+        card.append(draftInput(aid, {class:"answer", style:"min-height:120px", "aria-label":"Your answer", placeholder:"Answer in your own words before you see the checklist", disabled: S.readOnly || !S.db}),
+          el("div", {class:"actions"}, el("button", {class:"btn primary", disabled: S.readOnly || !S.db, onclick: () => { const v = drafts[aid] || ""; if (!v.trim()) return; delete drafts[aid]; save("exercises", e.id, {state:"committed", answer: v, checks: e.checklist.map(() => false)}); }, text:"Commit my answer"})));
+      } else {
+        card.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"Your answer"}), prose(st.answer || "")));
+        const checks = st.checks || e.checklist.map(() => false);
+        const list = el("div", {class:"checklist"}, el("span", {class:"lbl", text:"Tick what your answer covered"}));
+        e.checklist.forEach((item, i) => {
+          const cb = el("input", {type:"checkbox", id: "chk-" + e.id + "-" + i, checked: !!checks[i], disabled: S.readOnly || !S.db});
+          cb.addEventListener("change", () => { const next = checks.slice(); next[i] = cb.checked; const score = next.filter(Boolean).length; save("exercises", e.id, {checks: next, state: score >= Math.ceil(e.checklist.length * 2 / 3) ? "passed" : "committed"}); });
+          const span = el("span"); span.innerHTML = mdi(item);
+          list.append(el("label", {for: "chk-" + e.id + "-" + i}, cb, span));
+        });
+        const score = checks.filter(Boolean).length;
+        card.append(list, el("div", {class: "result " + (state === "passed" ? "ok" : "bad"), text: score + " of " + e.checklist.length + " covered" + (state === "passed" ? ". That counts as done." : ". Cover at least " + Math.ceil(e.checklist.length * 2 / 3) + " to count it as done.")}));
+        if (why) card.append(el("div", {class:"sec"}, el("span", {class:"lbl", text:"Why"}), blocks(why.blocks)));
+        card.append(el("div", {class:"actions"}, reset));
+      }
+    }
+    if (!compact) card.append(noteBox("exercises", e.id));
+    return card;
+  }
+
+  // ---------- Build brief (R17) ----------
+
+  // linkTopics turns every topic id printed as code in the brief into a link to
+  // its concept. This is what makes a build step startable: being stuck is one
+  // click, not a search.
+  function linkTopics(node){
+    for (const code of [...node.querySelectorAll("code")]) {
+      const id = code.textContent.trim();
+      const t = topicById(id);
+      if (!t || !t.lesson) continue;
+      const a = el("a", {href: "#lesson-" + t.lesson, title: t.title, onclick: ev => { ev.preventDefault(); openLesson(t.lesson, "c-" + id); }});
+      a.append(code.cloneNode(true));
+      code.replaceWith(a);
+    }
+    return node;
+  }
+
+  function viewBrief(id){
+    const br = briefFor(id);
+    if (!br) return el("p", {text:"That build step has no brief."});
+    const b = S.content.curriculum.builds.find(x => x.id === id);
+    const m = b ? msById(b.milestone) : null;
+
+    const box = el("section", {id:"top-of-lesson"});
+    box.append(el("div", {class:"crumb"},
+      el("button", {class:"btn quiet", onclick: () => setRoute("journey"), text:"← Journey"}),
+      m ? el("span", {class:"eyebrow", text: m.code + " · build step"}) : null));
+    box.append(el("div", {class:"lesson-head"},
+      el("h2", {text: b ? b.title : id}),
+      el("p", {class:"muted", text:"You can start here. Every topic below links to the concept that explains it — open one when you are stuck, not before."})));
+
+    // What it draws on, with where you are on each.
+    if (br.needs.length) {
+      const list = el("div", {class:"list"});
+      for (const tid of br.needs) {
+        const t = topicById(tid);
+        if (!t) continue;
+        const st = topicState(t);
+        list.append(el(t.lesson ? "button" : "div", {class:"row" + (t.lesson ? " link" : ""), onclick: t.lesson ? () => openLesson(t.lesson, "c-" + tid) : null},
+          el("span", null, el("span", {class:"rt", text: t.title}), el("small", {text: tid})),
+          el("span", null, el("span", {class:"chip " + t.track, text: t.track === "design" ? "system design" : t.track}), " ", el("span", {class:"pill " + st, text: STATE_LABEL[st]}))));
+      }
+      box.append(el("div", {class:"card"}, el("span", {class:"lbl", text:"Concepts this step draws on"}), list));
+    }
+
+    box.append(linkTopics(prose(br.markdown)));
+
+    const names = Object.keys(br.tests).sort();
+    if (names.length) {
+      box.append(el("h2", {text:"The contract tests", style:"margin:22px 0 10px"}));
+      box.append(el("p", {class:"muted prose", text:"These are the specification. Copy them next to your code and make them pass — there is no other description of done."}));
+      for (const n of names) box.append(codeBox({lang:"go", t: br.tests[n], file: n}, "go test"));
+    }
+    return box;
+  }
+
+  // ---------- Topics ----------
+  function viewTopics(){
+    const box = el("section");
+    const topics = S.content.curriculum.topics;
+    const states = ["all","learned","understood","practised","ready","planned","bonus","skipped","not-planned"];
+    const counts = {}; topics.forEach(t => { const s = topicState(t); counts[s] = (counts[s] || 0) + 1; });
+    box.append(el("p", {class:"muted prose", text: "Every topic the journey covers: " + topics.length + " in all, " + topics.filter(t => t.kind === "core").length + " of them core. A topic is learned once you've marked it understood and passed an exercise that practises it (or tested out of its lesson)."}));
+    const f = el("div", {class:"filters", role:"group", "aria-label":"Filter by state"});
+    for (const s of states) f.append(el("button", {"aria-pressed": String(S.filter === s), onclick: () => { S.filter = s; renderAll(); }, text: (s === "all" ? "All" : STATE_LABEL[s]) + " · " + (s === "all" ? topics.length : counts[s] || 0)}));
+    box.append(f);
+    const grid = el("div", {class:"tgrid"});
+    for (const [k, label] of TRACKS) {
+      const list = topics.filter(t => t.track === k);
+      const core = list.filter(t => t.kind === "core");
+      const learned = core.filter(t => topicState(t) === "learned").length;
+      const col = el("div", {class:"tcol"}, el("h3", null, label, el("small", {text: learned + "/" + core.length + " core learned"})));
+      const ms = id => (msById(id) || {code:"—"}).code;
+      const shown = list.filter(t => S.filter === "all" || topicState(t) === S.filter).sort((a, b) => ((msById(a.milestone) || {order:99}).order - (msById(b.milestone) || {order:99}).order));
+      if (!shown.length) col.append(el("p", {class:"muted", text:"None."}));
+      for (const t of shown) {
+        const st = topicState(t);
+        const clickable = !!t.lesson;
+        col.append(el(clickable ? "button" : "div", {class:"trow" + (clickable ? " link" : ""), title: t.reason || "", onclick: clickable ? () => openLesson(t.lesson, "c-" + t.id) : null},
+          el("span", {class:"m", text: t.milestone ? ms(t.milestone) : "—"}), el("span", {text: t.title}), el("span", {class:"pill " + st, text: STATE_LABEL[st]})));
+      }
+      grid.append(col);
+    }
+    box.append(grid);
+    return box;
+  }
+
+  // ---------- Feature ----------
+  function viewFeature(){
+    const caps = S.content.curriculum.capabilities;
+    const box = el("section");
+    box.append(el("p", {class:"muted prose", text:"The shipment booking feature, split into the capabilities it needs. The pilot (one parcel, domestic, standard service) is the ones marked pilot. It's complete when all of those work."}));
+    const tbl = el("table", {class:"plain"}, el("thead", null, el("tr", null, el("th", {text:""}), el("th", {text:"Capability"}), el("th", {text:"Milestone"}), el("th", {text:"State"}))));
+    const tb = el("tbody");
+    for (const c of caps) tb.append(el("tr", null, el("td", {class:"muted", text: c.id}), el("td", null, c.title, c.pilot ? el("span", {class:"chip build", style:"margin-left:8px", text:"pilot"}) : null), el("td", {text: (msById(c.milestone) || {}).code || ""}), el("td", null, el("span", {class:"pill " + c.state, text: {planned:"Planned","in-progress":"In progress",working:"Working"}[c.state]}))));
+    tbl.append(tb);
+    box.append(el("div", {class:"tablewrap"}, tbl));
+    box.append(el("h3", {text:"Build steps", style:"margin:22px 0 8px"}));
+    const bt = el("table", {class:"plain"}, el("thead", null, el("tr", null, el("th", {text:"Milestone"}), el("th", {text:"Step"}), el("th", {text:"Who"}), el("th", {text:"State"}))));
+    const bb = el("tbody");
+    for (const b of S.content.curriculum.builds) { const done = buildDone(b); bb.append(el("tr", null, el("td", {text: (msById(b.milestone) || {}).code}), el("td", {text: b.title}), el("td", {class:"owner", text: {you:"You", claude:"Claude", both:"Claude + you"}[b.owner]}), el("td", null, el("span", {class:"pill " + (done ? "done" : b.state), text: done ? "Done" : b.state === "in-progress" ? "In progress" : "Planned"})))); }
+    bt.append(bb);
+    box.append(el("div", {class:"tablewrap"}, bt));
+    return box;
+  }
+
+  // ---------- Notes ----------
+  function viewNotes(){
+    const box = el("section");
+    let any = false;
+    for (const l of S.content.lessons) {
+      const items = [];
+      for (const c of l.concepts) { const n = (S.concepts[c.id] || {}).note; if (n && n.trim()) items.push([c.title, n, "c-" + c.id]); }
+      for (const e of l.exercises) { const n = (S.exercises[e.id] || {}).note; if (n && n.trim()) items.push([e.title, n, "x-" + e.id]); }
+      if (!items.length) continue;
+      any = true;
+      box.append(el("h3", {text: (msById(l.milestone) || {}).code + " · " + l.title, style:"margin:14px 0 8px"}));
+      for (const [title, note, anchor] of items) {
+        const t = el("button", {class:"btn quiet", style:"padding:0;text-align:left", onclick: () => openLesson(l.id, anchor)}); t.innerHTML = mdi(title);
+        box.append(el("div", {class:"card"}, t, el("p", {style:"white-space:pre-wrap;margin:6px 0 0", text: note})));
+      }
+    }
+    if (!any) box.append(el("p", {class:"muted", text:"Nothing yet. Every concept and exercise has a note box. What you write there shows up here, all in one place."}));
+    return box;
+  }
+
+  // ---------- Decisions & Log ----------
+  function viewDecisions(){
+    const box = el("section");
+    box.append(el("h3", {text:"Still open", style:"margin-bottom:8px"}));
+    const ot = el("table", {class:"plain"}, el("thead", null, el("tr", null, el("th", {text:"id"}), el("th", {text:"Question"}), el("th", {text:"Status"}), el("th", {text:"About"}))));
+    const ob = el("tbody"); for (const r of S.content.open || []) { const q = el("td"); q.innerHTML = mdi(r.question); const s = el("td"); s.innerHTML = mdi(r.status); ob.append(el("tr", null, el("td", {text: r.id}), q, s, el("td", {class:"muted", text: r.source}))); }
+    ot.append(ob); box.append(el("div", {class:"tablewrap"}, ot));
+    box.append(el("h3", {text:"Decided", style:"margin:20px 0 8px"}));
+    const dt = el("table", {class:"plain"}, el("thead", null, el("tr", null, el("th", {text:"id"}), el("th", {text:"Decision"}), el("th", {text:"Choice"}), el("th", {text:"About"}), el("th", {text:"When"}))));
+    const db = el("tbody"); for (const r of S.content.decided || []) { const c = el("td"); c.innerHTML = mdi(r.choice); db.append(el("tr", null, el("td", {text: r.id}), el("td", {text: r.decision}), c, el("td", {class:"muted", text: r.source}), el("td", {class:"muted", text: r.when}))); }
+    dt.append(db); box.append(el("div", {class:"tablewrap"}, dt));
+    if (S.content.docs.productRequirements) box.append(el("details", {style:"margin-top:20px"}, el("summary", {style:"cursor:pointer;font-weight:500", text:"Product requirements"}), prose(S.content.docs.productRequirements)));
+    box.append(el("details", {style:"margin-top:10px"}, el("summary", {style:"cursor:pointer;font-weight:500", text:"Learning requirements"}), prose(S.content.docs.requirements)));
+    return box;
+  }
+  function viewLog(){ return prose(S.content.docs.log); }
+
+  // ---------- routing ----------
+  function setRoute(r){
+    S.route = r;
+    if (!r.startsWith("lesson-")) S.testout = null;
+    try { history.replaceState(null, "", "#" + r); } catch (e) {}
+    try { localStorage.setItem("lbb-route", r); } catch (e) {}
+    if (!pendingScroll && (r.startsWith("lesson-") || r.startsWith("brief-"))) pendingScroll = "top-of-lesson";
+    renderAll();
+    if (!r.startsWith("lesson-")) window.scrollTo({top: 0});
+  }
+
+  // ---------- start ----------
+  async function start(){
+    try {
+      const res = await fetch("content.json", {cache: "no-cache"});
+      S.content = await res.json();
+      TRACKS = (S.content.curriculum.tracks || []).map(t => [t.key, t.label]);
+      const tt = T();
+      document.getElementById("track-title").textContent = tt.title || "Learning logbook";
+      document.getElementById("eyebrow").textContent = tt.eyebrow || "";
+      document.getElementById("lede").textContent = tt.lede || "";
+      const route = document.getElementById("route");
+      (tt.route || []).forEach((step, i) => { if (i) route.append(el("span", {text:"→"})); route.append(el("b", {class: i < 2 ? "now" : "", text: step})); });
+      if (!(tt.route || []).length) route.hidden = true;
+    } catch (e) {
+      document.getElementById("view").replaceChildren(el("p", {class:"muted", text:"The lessons couldn't be loaded. Reload the page."}));
+      return;
+    }
+    let r = (location.hash || "").slice(1);
+    if (!r) { try { r = localStorage.getItem("lbb-route") || ""; } catch (e) {} }
+    S.route = r && (TABS.some(t => t[0] === r) || (r.startsWith("lesson-") && lessonsById()[r.slice(7)]) || (r.startsWith("brief-") && briefFor(r.slice(6)))) ? r : "journey";
+    renderAll();
+
+    const api = window.claude && window.claude.use ? window.claude : null;
+    const db = api ? await api.use("db") : null;
+    if (!db) { showNotice("Progress can't be saved in this view: you can read everything, but ticks, answers and notes won't be kept. Open the board from claude.ai while signed in."); renderAll(); return; }
+    S.db = db;
+    try { const user = await api.use("user"); if (user && user.can) { const w = await user.can("data.write"); if (w === false) S.readOnly = true; } } catch (e) {}
+    for (const coll of ["concepts", "exercises", "lessons"]) {
+      db.collection(coll).onSnapshot(q => {
+        const next = {};
+        q.docs.forEach(d => { next[d.id] = Object.assign({}, d.data()); });
+        S[coll] = next;
+        renderAll();
+      }, () => showNotice("Live updates stopped. Reload the page to reconnect."));
+    }
+    renderAll();
+  }
+  window.addEventListener("hashchange", () => { const r = location.hash.slice(1); if (r && r !== S.route) { S.route = r; renderAll(); } });
+  start();
+})();
+</script>

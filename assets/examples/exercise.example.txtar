@@ -1,0 +1,46 @@
+Exercise m00-l2-e1 (write).
+-- starter/splitcost.go --
+// Package splitcost divides a rate between parcels.
+package splitcost
+
+// SplitCost returns what each parcel pays and the rupees left over.
+// For zero or negative parcels it returns 0, 0.
+func SplitCost(total, parcels int) (int, int) {
+	// TODO: write this. The tests in splitcost_test.go show what's expected.
+	return 0, 0
+}
+-- solution/splitcost.go --
+// Package splitcost divides a rate between parcels.
+package splitcost
+
+// SplitCost returns what each parcel pays and the rupees left over.
+// For zero or negative parcels it returns 0, 0.
+func SplitCost(total, parcels int) (int, int) {
+	if parcels <= 0 {
+		return 0, 0
+	}
+	return total / parcels, total % parcels
+}
+-- splitcost_test.go --
+package splitcost
+
+import "testing"
+
+func TestSplitCost(t *testing.T) {
+	cases := []struct {
+		total, parcels int
+		each, left        int
+	}{
+		{10000, 3, 3333, 1},
+		{9000, 2, 4500, 0},
+		{4257, 1, 4257, 0},
+		{500, 0, 0, 0},
+		{500, -2, 0, 0},
+	}
+	for _, c := range cases {
+		each, left := SplitCost(c.total, c.parcels)
+		if each != c.each || left != c.left {
+			t.Errorf("SplitCost(%d, %d) = %d, %d; want %d, %d", c.total, c.parcels, each, left, c.each, c.left)
+		}
+	}
+}

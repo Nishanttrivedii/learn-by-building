@@ -1,0 +1,267 @@
+{
+  "tracks": [
+    {
+      "key": "go",
+      "label": "Go"
+    },
+    {
+      "key": "design",
+      "label": "System design"
+    },
+    {
+      "key": "pattern",
+      "label": "Design patterns"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "m00",
+      "code": "M0",
+      "order": 0,
+      "title": "Go setup and your first programs",
+      "goal": "Run, check and read Go code before writing anything real.",
+      "gate": "You can run Go, read the hotel flow’s supplier-code file, and explain what each part of it does."
+    },
+    {
+      "id": "m01",
+      "code": "M1",
+      "order": 1,
+      "title": "Our own shipment data model",
+      "goal": "Decide what “a shipping option” means in our words, not Swiftpost’s or Cargolink’s.",
+      "gate": "The unified shipment models exist in Go, compile, and a Swiftpost and an Cargolink example both fit them."
+    },
+    {
+      "id": "m02",
+      "code": "M2",
+      "order": 2,
+      "title": "The supplier contract",
+      "goal": "One Go interface every shipping carrier implements.",
+      "gate": "The ShipmentProvider interface compiles, and a fake supplier implements it and returns test data."
+    },
+    {
+      "id": "m03",
+      "code": "M3",
+      "order": 3,
+      "title": "Swiftpost client and login",
+      "goal": "Call Swiftpost Express safely: log in, keep the token fresh, time out, handle errors.",
+      "gate": "A login against Swiftpost (or its fake, until Q1 is answered) works, and the token is reused until shortly before it expires."
+    },
+    {
+      "id": "m04",
+      "code": "M4",
+      "order": 4,
+      "title": "Search and normalizer",
+      "goal": "Turn Swiftpost’s ID-linked lookup tables into our flat shipping options.",
+      "gate": "A Swiftpost search response comes back as unified options, with packaging and rate rules joined in."
+    },
+    {
+      "id": "m06",
+      "code": "M6",
+      "order": 6,
+      "title": "Preview, extras and hold",
+      "goal": "Confirm the price, offer insurance, signature and packaging, then reserve with recipient and tax details.",
+      "gate": "Preview → hold works, including a changed price, an expired preview, and a hold with tax details."
+    }
+  ],
+  "builds": [
+    {
+      "id": "m00-read",
+      "milestone": "m00",
+      "title": "Read how the hotel flow names its suppliers",
+      "owner": "you",
+      "exercise": "m00-read-provider",
+      "state": "planned"
+    },
+    {
+      "id": "m01-b1",
+      "milestone": "m01",
+      "title": "Write the unified shipment models",
+      "owner": "you",
+      "exercise": null,
+      "state": "planned"
+    },
+    {
+      "id": "m02-read",
+      "milestone": "m02",
+      "title": "Read the hotel adapter contract",
+      "owner": "you",
+      "exercise": null,
+      "state": "planned"
+    },
+    {
+      "id": "m02-b1",
+      "milestone": "m02",
+      "title": "Write the supplier contract and a fake supplier",
+      "owner": "you",
+      "exercise": null,
+      "state": "planned"
+    },
+    {
+      "id": "m03-b1",
+      "milestone": "m03",
+      "title": "Swiftpost Express client and token cache (you write the freshness check)",
+      "owner": "both",
+      "exercise": null,
+      "state": "planned"
+    },
+    {
+      "id": "m04-b1",
+      "milestone": "m04",
+      "title": "Write the Swiftpost normalizer",
+      "owner": "you",
+      "exercise": null,
+      "state": "planned"
+    },
+    {
+      "id": "m06-b1",
+      "milestone": "m06",
+      "title": "Preview and hold (you write the expiry check)",
+      "owner": "both",
+      "exercise": null,
+      "state": "planned"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "F3",
+      "title": "Confirm the rate, including “price changed”",
+      "milestone": "m06",
+      "pilot": true,
+      "state": "planned"
+    },
+    {
+      "id": "F4",
+      "title": "Hold with recipients and tax",
+      "milestone": "m06",
+      "pilot": true,
+      "state": "planned"
+    }
+  ],
+  "topics": [
+    {
+      "id": "go.toolchain",
+      "track": "go",
+      "title": "go run, build, vet, test, gofmt, and go.mod",
+      "milestone": "m00",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core",
+      "relation": "new"
+    },
+    {
+      "id": "go.packages",
+      "track": "go",
+      "title": "Packages, imports, exported (capitalised) names, the module path",
+      "milestone": "m00",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core",
+      "relation": "differs"
+    },
+    {
+      "id": "go.vars-types",
+      "track": "go",
+      "title": "var, :=, const, basic types, explicit conversions",
+      "milestone": "m00",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core",
+      "relation": "differs"
+    },
+    {
+      "id": "go.control-flow",
+      "track": "go",
+      "title": "if with an init statement, for as the only loop, switch without fall-through",
+      "milestone": "m00",
+      "kind": "core",
+      "usedBy": "m04-b1",
+      "depth": "core",
+      "relation": "differs"
+    },
+    {
+      "id": "go.functions",
+      "track": "go",
+      "title": "Multiple return values, variadic functions, functions as values",
+      "milestone": "m00",
+      "kind": "core",
+      "usedBy": "m03-b1",
+      "depth": "core",
+      "relation": "differs"
+    },
+    {
+      "id": "go.fmt",
+      "track": "go",
+      "title": "fmt verbs (%v %+v %T %q) for printing and debugging",
+      "milestone": "m00",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core",
+      "relation": "differs"
+    },
+    {
+      "id": "go.strings",
+      "track": "go",
+      "title": "Strings are bytes; runes and UTF-8; the strings package",
+      "milestone": "m00",
+      "kind": "core",
+      "usedBy": "m06-b1",
+      "depth": "core",
+      "relation": "differs"
+    },
+    {
+      "id": "go.structs",
+      "track": "go",
+      "title": "Structs, struct literals, field tags",
+      "milestone": "m01",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core"
+    },
+    {
+      "id": "go.named-types",
+      "track": "go",
+      "title": "Named types, and const + iota in place of enums",
+      "milestone": "m01",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core"
+    },
+    {
+      "id": "go.zero-values",
+      "track": "go",
+      "title": "Zero values; \"missing\" vs \"empty\"; pointers for optional fields",
+      "milestone": "m01",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core"
+    },
+    {
+      "id": "go.json",
+      "track": "go",
+      "title": "encoding/json: marshal, unmarshal, tags, omitempty",
+      "milestone": "m01",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core"
+    },
+    {
+      "id": "go.time",
+      "track": "go",
+      "title": "time.Time, Duration, layouts (02/01/2006 = Swiftpost's dd/MM/yyyy), time zones",
+      "milestone": "m01",
+      "kind": "core",
+      "usedBy": "m01-b1",
+      "depth": "core"
+    },
+    {
+      "id": "go.build-tags",
+      "track": "go",
+      "title": "Build constraints",
+      "milestone": null,
+      "kind": "not-planned",
+      "usedBy": null,
+      "reason": "nothing here needs per-platform builds",
+      "depth": "advanced"
+    }
+  ]
+}

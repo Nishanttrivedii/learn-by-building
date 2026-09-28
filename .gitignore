@@ -1,0 +1,3 @@
+progress/
+*.local.json
+.DS_Store

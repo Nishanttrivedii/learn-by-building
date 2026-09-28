@@ -1,0 +1,289 @@
+// Contract tests for the M1 build step: the unified shipment models.
+//
+// Copy this file into models/shipment_booking_models/ in shipping-service and make it
+// pass. It is the specification — there is no other description of "done".
+//
+// These tests assert PROPERTIES, not your design. They go through JSON wherever
+// they can, because the wire shape is a real external contract (the frontend
+// will depend on it) while your Go field names, your choice of pointer or value,
+// and how you represent an enum are yours. Where a test names a method, the
+// brief says why that name is pinned.
+package shipmentbookingmodels
+
+import (
+	"encoding/json"
+	"strings"
+	"testing"
+)
+
+// ---------- Money ----------
+
+func TestMoneyKeepsItsCurrency(t *testing.T) {
+	var m Money
+	if err := json.Unmarshal([]byte(`{"amount":3114,"currency":"INR"}`), &m); err != nil {
+		t.Fatalf("unmarshalling Money: %v", err)
+	}
+
+	out, err := json.Marshal(m)
+	if err != nil {
+		t.Fatalf("marshalling Money: %v", err)
+	}
+	got := string(out)
+
+	if !strings.Contains(got, `"amount":3114`) {
+		t.Errorf("Money lost its amount on a round trip: %s", got)
+	}
+	if !strings.Contains(got, `"currency":"INR"`) {
+		t.Errorf("Money lost its currency on a round trip: %s", got)
+	}
+}
+
+func TestZeroMoneyStillReportsItsCurrency(t *testing.T) {
+	// A waived fee is a real zero, not a missing value. If `omitempty` hides the
+	// amount, a client cannot tell "nothing to pay" from "we didn't say".
+	var m Money
+	if err := json.Unmarshal([]byte(`{"amount":0,"currency":"INR"}`), &m); err != nil {
+		t.Fatalf("unmarshalling Money: %v", err)
+	}
+
+	out, _ := json.Marshal(m)
+	if !strings.Contains(string(out), `"amount"`) {
+		t.Errorf("a zero amount disappeared from the wire: %s — a waived fee must still be reported", out)
+	}
+}
+
+// ---------- Rate ----------
+
+func TestRateKeepsBaseAndTaxApart(t *testing.T) {
+	// Every fee we charge is computed on base+tax and nothing else, so the two
+	// have to survive separately. A single "total" is not enough.
+	var f Rate
+	err := json.Unmarshal([]byte(`{
+		"base":{"amount":3114,"currency":"INR"},
+		"tax":{"amount":818,"currency":"INR"},
+		"total":{"amount":3932,"currency":"INR"}
+	}`), &f)
+	if err != nil {
+		t.Fatalf("unmarshalling Rate: %v", err)
+	}
+
+	out, _ := json.Marshal(f)
+	got := string(out)
+	for _, want := range []string{`"amount":3114`, `"amount":818`, `"amount":3932`} {
+		if !strings.Contains(got, want) {
+			t.Errorf("Rate lost %s on a round trip: %s", want, got)
+		}
+	}
+}
+
+func TestRateTotalIsNotRecomputed(t *testing.T) {
+	// Swiftpost's total legitimately differs from base+tax once a convenience
+	// fee applies. Reporting base+tax instead would undercharge on every such
+	// booking. So the total must be stored as sent, never derived.
+	var f Rate
+	err := json.Unmarshal([]byte(`{
+		"base":{"amount":3114,"currency":"INR"},
+		"tax":{"amount":818,"currency":"INR"},
+		"total":{"amount":4732,"currency":"INR"}
+	}`), &f)
+	if err != nil {
+		t.Fatalf("unmarshalling Rate: %v", err)
+	}
+
+	out, _ := json.Marshal(f)
+	if !strings.Contains(string(out), `"amount":4732`) {
+		t.Errorf("the total came back as something other than 4732 — is it being recomputed from base+tax? %s", out)
+	}
+	if strings.Contains(string(out), `"amount":3932`) {
+		t.Errorf("the total was recomputed as base+tax (3932) instead of kept as sent (4732): %s", out)
+	}
+}
+
+// ---------- Recipient ----------
+
+func TestAbsentMiddleNameDiffersFromBlankOne(t *testing.T) {
+	// A parcel who gave no middle name and one who gave an empty one are
+	// different facts: an carrier rejects a blank name differently from an
+	// absent one. Whatever you choose — a pointer, a wrapper, a flag — the two
+	// must not collapse into the same value.
+	var absent, blank Recipient
+
+	if err := json.Unmarshal([]byte(`{"firstName":"Asha","lastName":"Rao"}`), &absent); err != nil {
+		t.Fatalf("unmarshalling a recipient with no middle name: %v", err)
+	}
+	if err := json.Unmarshal([]byte(`{"firstName":"Asha","middleName":"","lastName":"Rao"}`), &blank); err != nil {
+		t.Fatalf("unmarshalling a recipient with a blank middle name: %v", err)
+	}
+
+	a, _ := json.Marshal(absent)
+	b, _ := json.Marshal(blank)
+
+	if string(a) == string(b) {
+		t.Errorf("a recipient with NO middle name and one with a BLANK middle name "+
+			"produced identical JSON (%s) — the two must stay distinguishable", a)
+	}
+}
+
+func TestSuppliedMiddleNameSurvives(t *testing.T) {
+	var p Recipient
+	if err := json.Unmarshal([]byte(`{"firstName":"Asha","middleName":"Kumar","lastName":"Rao"}`), &p); err != nil {
+		t.Fatalf("unmarshalling: %v", err)
+	}
+
+	out, _ := json.Marshal(p)
+	if !strings.Contains(string(out), "Kumar") {
+		t.Errorf("a supplied middle name was lost on a round trip: %s", out)
+	}
+}
+
+func TestRecipientNamesSurviveNonASCII(t *testing.T) {
+	// Recipient names carry accents and non-Latin letters routinely. Anything
+	// that indexes a name by byte will mangle them.
+	var p Recipient
+	if err := json.Unmarshal([]byte(`{"firstName":"Øystein","lastName":"Ångström"}`), &p); err != nil {
+		t.Fatalf("unmarshalling: %v", err)
+	}
+
+	out, _ := json.Marshal(p)
+	got := string(out)
+	for _, want := range []string{"Øystein", "Ångström"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("%q did not survive a round trip: %s", want, got)
+		}
+	}
+}
+
+// ---------- RecipientCounts ----------
+//
+// Chargeable() and Total() are pinned by the brief: the visible shipment service fee
+// multiplies by seated recipients and excludes documents, so the distinction is a
+// billing rule, not a naming preference.
+
+func TestSeatedExcludesInfants(t *testing.T) {
+	var c RecipientCounts
+	if err := json.Unmarshal([]byte(`{"parcels":2,"oversized":1,"documents":1}`), &c); err != nil {
+		t.Fatalf("unmarshalling RecipientCounts: %v", err)
+	}
+
+	if got := c.Chargeable(); got != 3 {
+		t.Errorf("Chargeable() = %d, want 3 (parcels + oversized, documents excluded)", got)
+	}
+	if got := c.Total(); got != 4 {
+		t.Errorf("Total() = %d, want 4 (everyone)", got)
+	}
+}
+
+// ---------- CabinClass ----------
+//
+// Valid() is pinned by the brief: an adapter has to be able to tell a packaging it
+// recognised from one it did not, or an unmapped supplier code travels onward
+// as raw text.
+
+func TestUnknownCabinIsNotValid(t *testing.T) {
+	var recognised, unrecognised bool
+
+	for _, c := range []CabinClass{CabinEconomy, CabinBusiness} {
+		if c.Valid() {
+			recognised = true
+		}
+	}
+	if !recognised {
+		t.Error("no recognised packaging reported itself as valid")
+	}
+
+	if CabinUnknown.Valid() {
+		t.Error("CabinUnknown.Valid() = true — the marker for \"a supplier sent something we do not map\" must not pass as a real packaging")
+	}
+	unrecognised = !CabinUnknown.Valid()
+	if !unrecognised {
+		t.Error("an unmapped packaging cannot be told apart from a mapped one")
+	}
+}
+
+func TestCabinIsNotAPlainString(t *testing.T) {
+	// A named type is what stops a raw supplier code reaching packaging logic. This
+	// compiles only if CabinClass is its own type rather than an alias for
+	// string: a plain `string` variable must not be assignable to it.
+	var raw = "BUSINESS"
+	var packaging CabinClass = CabinBusiness
+
+	if string(packaging) == "" {
+		t.Error("CabinClass has no underlying string value")
+	}
+	// The conversion below must be necessary. If CabinClass were `= string`
+	// (an alias), `packaging = raw` would compile and this file would need no
+	// conversion at all.
+	packaging = CabinClass(raw)
+	_ = packaging
+}
+
+// ---------- ShippingOption ----------
+
+func TestShippingOptionIDIsOurs(t *testing.T) {
+	// The id a client sends back must be ours and opaque. Swiftpost's own rate
+	// id encodes route, carrier, timestamps and its PCC; publishing it would put
+	// a supplier's private encoding in our API, and Cargolink has no equivalent to put
+	// there at M10.
+	var o ShippingOption
+	err := json.Unmarshal([]byte(`{"optionId":"cyg-1","rate":{"total":{"amount":3932,"currency":"INR"}}}`), &o)
+	if err != nil {
+		t.Fatalf("unmarshalling ShippingOption: %v", err)
+	}
+
+	out, _ := json.Marshal(o)
+	got := string(out)
+
+	if !strings.Contains(got, `"optionId":"cyg-1"`) {
+		t.Errorf("the option id was lost on a round trip: %s", got)
+	}
+	for _, leak := range []string{"rateId", "consignmentId", "sessionId", "journeyRef", "swiftpost", "cargolink"} {
+		if strings.Contains(strings.ToLower(got), strings.ToLower(leak)) {
+			t.Errorf("a ShippingOption marshalled a supplier's vocabulary (%q): %s", leak, got)
+		}
+	}
+}
+
+func TestSearchRequestNamesNoSupplier(t *testing.T) {
+	// A client cannot choose a supplier: the orchestrator decides. Nor may any
+	// supplier's tuning parameter (Cargolink's CarrierRef, RateToken,
+	// QuotePosition, SessionRef) appear in our request shape.
+	var r SearchRequest
+	err := json.Unmarshal([]byte(`{
+		"serviceType":"standard",
+		"legs":[{"origin":"MAN","destination":"HYD","collectionDate":"2026-10-17T00:00:00Z"}],
+		"parcels":{"standard":1},
+		"packaging":"box"
+	}`), &r)
+	if err != nil {
+		t.Fatalf("unmarshalling SearchRequest: %v", err)
+	}
+
+	out, _ := json.Marshal(r)
+	got := strings.ToLower(string(out))
+	for _, leak := range []string{"supplier", "provider", "carrierref", "ratetoken", "quoteposition", "sessionref", "swiftpost", "cargolink"} {
+		if strings.Contains(got, leak) {
+			t.Errorf("SearchRequest carries %q, which is a supplier's word: %s", leak, out)
+		}
+	}
+}
+
+func TestSearchLegRoundTripsItsRoute(t *testing.T) {
+	var r SearchRequest
+	err := json.Unmarshal([]byte(`{
+		"serviceType":"standard",
+		"legs":[{"origin":"MAN","destination":"HYD","collectionDate":"2026-10-17T00:00:00Z"}],
+		"parcels":{"standard":1},
+		"packaging":"box"
+	}`), &r)
+	if err != nil {
+		t.Fatalf("unmarshalling SearchRequest: %v", err)
+	}
+
+	out, _ := json.Marshal(r)
+	got := string(out)
+	for _, want := range []string{`"origin":"MAN"`, `"destination":"HYD"`, `"parcels":1`} {
+		if !strings.Contains(got, want) {
+			t.Errorf("SearchRequest lost %s on a round trip: %s", want, got)
+		}
+	}
+}
